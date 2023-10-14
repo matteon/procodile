@@ -10,7 +10,15 @@ module Procodile
       text.to_s.lines.map(&:chomp).each do |message|
         output  = ""
         output += "#{Time.now.strftime("%H:%M:%S")} #{name.ljust(18, ' ')} | ".color(color)
-        output += message
+        begin
+          message = message.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+          output += message
+        rescue Encoding::UndefinedConversionError => error
+          output += "********** ERROR WITH ENCODING (Encoding::UndefinedConversionError) **********"
+          output += "#{error}"
+          output += "#{error.message}"
+        end
+        
         $stdout.puts output
         $stdout.flush
       end
